@@ -258,44 +258,32 @@
 <script>
 let registeredUsers = [];
 
-async function loadLocalExcel() {
+    async function loadGoogleSheetData() {
     try {
-        console.log('Intentando cargar el archivo de Excel...');
-        
-        // Realiza la solicitud para cargar el archivo
-        const response = await fetch('asistentes.xlsx');
-        
-        // Verifica si la respuesta es exitosa
-        if (!response.ok) {
-            throw new Error(`Error al cargar el archivo: ${response.status} - ${response.statusText}`);
-        }
-        
-        // Lee el contenido del archivo
-        const data = await response.arrayBuffer();
-        console.log('Archivo de Excel cargado exitosamente.');
-
-        // Crea el libro de trabajo a partir de los datos
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        // Verifica si existe la hoja "EVENTO"
-        const sheet = workbook.Sheets['EVENTO'];
-        if (!sheet) {
-            throw new Error("La hoja 'EVENTO' no se encontró en el archivo.");
-        }
-        
-        // Convierte la hoja en JSON
-        registeredUsers = XLSX.utils.sheet_to_json(sheet);
-        console.log('Usuarios registrados:', registeredUsers);  // Depuración
-
-        // Actualiza la gráfica u otros elementos (si corresponde)
-        updateStatsChart();  // Define o comenta esta función si no se usa
+        const response = await fetch('YOUR_WEB_APP_URL'); // Usa la URL de tu Web App aquí.
+        if (!response.ok) throw new Error('Error al cargar datos');
+        const data = await response.json();
+        console.log('Datos cargados:', data);
+        // Maneja los datos según tus necesidades
     } catch (error) {
-        console.error('Error loading Excel file:', error);
-        alert('Hubo un problema al cargar los datos del archivo de Excel: ' + error.message);
+        console.error('Error:', error);
+        alert('No se pudo cargar la información');
     }
 }
 
+    async function updateGoogleSheetRow(rowNumber, nombre, documento, telefono, correo, permiso) {
+    try {
+        const url = `YOUR_WEB_APP_URL?rowNumber=${rowNumber}&nombre=${nombre}&documento=${documento}&telefono=${telefono}&correo=${correo}&permiso=${permiso}`;
+        const response = await fetch(url, { method: 'POST' });
+        const result = await response.text();
+        alert(result); // Muestra un mensaje de confirmación
+    } catch (error) {
+        console.error('Error:', error);
+        alert('No se pudo actualizar la fila');
+    }
+}
 
+    
 
 function buscarQR() {
     const qrCode = document.getElementById('searchQR').value;
