@@ -260,148 +260,41 @@ let registeredUsers = [];
 
 async function loadLocalExcel() {
     try {
+        console.log('Intentando cargar el archivo de Excel...');
+        
+        // Realiza la solicitud para cargar el archivo
         const response = await fetch('asistentes.xlsx');
         
+        // Verifica si la respuesta es exitosa
         if (!response.ok) {
-            throw new Error(`Error al cargar el archivo: ${response.status}`);
+            throw new Error(`Error al cargar el archivo: ${response.status} - ${response.statusText}`);
         }
         
+        // Lee el contenido del archivo
         const data = await response.arrayBuffer();
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets['EVENTO'];
+        console.log('Archivo de Excel cargado exitosamente.');
 
+        // Crea el libro de trabajo a partir de los datos
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Verifica si existe la hoja "EVENTO"
+        const sheet = workbook.Sheets['EVENTO'];
         if (!sheet) {
             throw new Error("La hoja 'EVENTO' no se encontró en el archivo.");
         }
-
+        
+        // Convierte la hoja en JSON
         registeredUsers = XLSX.utils.sheet_to_json(sheet);
         console.log('Usuarios registrados:', registeredUsers);  // Depuración
-        updateStatsChart();  // Asegúrate de definir o eliminar esta función si no se usa
+
+        // Actualiza la gráfica u otros elementos (si corresponde)
+        updateStatsChart();  // Define o comenta esta función si no se usa
     } catch (error) {
         console.error('Error loading Excel file:', error);
-        alert('Hubo un problema al cargar los datos del archivo de Excel.');
+        alert('Hubo un problema al cargar los datos del archivo de Excel: ' + error.message);
     }
 }
 
-function showTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabName + 'Tab').classList.add('active');
-    
-    if(tabName === 'ingreso') {
-        document.querySelectorAll('#ingresoTab input').forEach(input => {
-            if(['nombre', 'documento', 'permiso'].includes(input.id)) {
-                input.disabled = true;
-            }
-        });
-        document.getElementById('permiso').disabled = true;
-    }
-}
-
-function validatePassword() {
-    const password = document.getElementById('password').value;
-    if (password === '123456') {
-        document.getElementById('novedadForm').style.display = 'block';
-        document.getElementById('passwordSection').style.display = 'none';
-        initCameraNovedad();
-        
-        document.querySelectorAll('#novedadForm input, #novedadForm select').forEach(input => {
-            input.disabled = false;
-        });
-    } else {
-        alert('Contraseña incorrecta');
-    }
-}
-
-function validatePasswordStats() {
-    const password = document.getElementById('passwordStats').value;
-    if (password === '123456') {
-        document.getElementById('passwordSectionStats').style.display = 'none';
-        document.getElementById('statsContent').style.display = 'block';
-        updateStatsChart();
-    } else {
-        alert('Contraseña incorrecta');
-    }
-}
-
-document.getElementById('searchBox').addEventListener('input', (e) => {
-    const searchValue = e.target.value;
-    const user = registeredUsers.find(user => String(user.documento) === searchValue);
-    if (user) {
-        fillFormWithUser(user);
-    } else {
-        document.getElementById('nombre').value = '';
-        document.getElementById('documento').value = '';
-        document.getElementById('telefono').value = '';
-        document.getElementById('correo').value = '';
-        document.getElementById('permiso').value = '';
-    }
-});
-
-document.getElementById('searchBoxNovedad').addEventListener('input', (e) => {
-    const searchValue = e.target.value.toLowerCase();
-    const user = registeredUsers.find(user => 
-        String(user.documento).toLowerCase().includes(searchValue) || 
-        String(user.nombre).toLowerCase().includes(searchValue)
-    );
-    
-    if (user) {
-        fillFormWithUserNovedad(user);
-    } else {
-        clearNovedadForm();
-    }
-});
-
-function fillFormWithUser(user) {
-    document.getElementById('nombre').value = user.nombre;
-    document.getElementById('documento').value = user.documento;
-    document.getElementById('telefono').value = user.telefono;
-    document.getElementById('correo').value = user.correo;
-    document.getElementById('permiso').value = user.permiso;
-}
-
-function fillFormWithUserNovedad(user) {
-    document.getElementById('nombreNovedad').value = user.nombre;
-    document.getElementById('documentoNovedad').value = user.documento;
-    document.getElementById('telefonoNovedad').value = user.telefono;
-    document.getElementById('correoNovedad').value = user.correo;
-    document.getElementById('permisoNovedad').value = user.permiso;
-}
-
-function clearNovedadForm() {
-    document.getElementById('nombreNovedad').value = '';
-    document.getElementById('documentoNovedad').value = '';
-    document.getElementById('telefonoNovedad').value = '';
-    document.getElementById('correoNovedad').value = '';
-    document.getElementById('permisoNovedad').value = '';
-}
-
-async function registrarIngresoYQR() {
-    const documento = document.getElementById('documento').value;
-    const index = registeredUsers.findIndex(user => user.documento === documento);
-    
-    if (index === -1) {
-        alert('Usuario no encontrado');
-        return;
-    }
-
-    const reader = document.getElementById('reader');
-    reader.style.display = 'block';
-    
-    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-    
-    html5QrcodeScanner.render((qrCode) => {
-        registeredUsers[index].qr = qrCode;
-        registeredUsers[index].registro = new Date().toISOString();
-        
-        html5QrcodeScanner.clear();
-        reader.style.display = 'none';
-        
-        alert('QR asignado correctamente');
-    });
-}
-
-// Cargar el archivo de Excel al iniciar
-window.onload = loadLocalExcel;
 
 
 function buscarQR() {
