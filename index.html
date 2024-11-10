@@ -260,8 +260,7 @@ let registeredUsers = [];
 
     async function loadGoogleSheetData() {
     try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbw318iF1Bk-akfeGz0s0DyDDZ4pAoyWlooA867WXgQ1y2CgEqPGPNxEaoJTQ9X14oAHHA/exec
-'); // Usa la URL de tu Web App aquí.
+        const response = await fetch('https://script.google.com/macros/s/AKfycbw318iF1Bk-akfeGz0s0DyDDZ4pAoyWlooA867WXgQ1y2CgEqPGPNxEaoJTQ9X14oAHHA/exec'); // Usa la URL de tu Web App aquí.
         if (!response.ok) throw new Error('Error al cargar datos');
         const data = await response.json();
         console.log('Datos cargados:', data);
@@ -274,8 +273,7 @@ let registeredUsers = [];
 
     async function updateGoogleSheetRow(rowNumber, nombre, documento, telefono, correo, permiso) {
     try {
-        const url = `https://script.google.com/macros/s/AKfycbw318iF1Bk-akfeGz0s0DyDDZ4pAoyWlooA867WXgQ1y2CgEqPGPNxEaoJTQ9X14oAHHA/exec
-?rowNumber=${rowNumber}&nombre=${nombre}&documento=${documento}&telefono=${telefono}&correo=${correo}&permiso=${permiso}&foto=${foto}&qr=${qr}&registro=${registro}&novedad=${novedad}`;
+        const url = `https://script.google.com/macros/s/AKfycbw318iF1Bk-akfeGz0s0DyDDZ4pAoyWlooA867WXgQ1y2CgEqPGPNxEaoJTQ9X14oAHHA/exec?rowNumber=${rowNumber}&nombre=${nombre}&documento=${documento}&telefono=${telefono}&correo=${correo}&permiso=${permiso}&foto=${foto}&qr=${qr}&registro=${registro}&novedad=${novedad}`;
         const response = await fetch(url, { method: 'POST' });
         const result = await response.text();
         alert(result); // Muestra un mensaje de confirmación
