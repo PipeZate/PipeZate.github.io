@@ -2,6 +2,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -260,13 +261,25 @@ let registeredUsers = [];
 async function loadLocalExcel() {
     try {
         const response = await fetch('asistentes.xlsx');
+        
+        if (!response.ok) {
+            throw new Error(`Error al cargar el archivo: ${response.status}`);
+        }
+        
         const data = await response.arrayBuffer();
-        const workbook = XLSX.read(data, {type: 'array'});
+        const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets['EVENTO'];
+
+        if (!sheet) {
+            throw new Error("La hoja 'EVENTO' no se encontró en el archivo.");
+        }
+
         registeredUsers = XLSX.utils.sheet_to_json(sheet);
-        updateStatsChart();
+        console.log('Usuarios registrados:', registeredUsers);  // Depuración
+        updateStatsChart();  // Asegúrate de definir o eliminar esta función si no se usa
     } catch (error) {
         console.error('Error loading Excel file:', error);
+        alert('Hubo un problema al cargar los datos del archivo de Excel.');
     }
 }
 
@@ -386,6 +399,10 @@ async function registrarIngresoYQR() {
         alert('QR asignado correctamente');
     });
 }
+
+// Cargar el archivo de Excel al iniciar
+window.onload = loadLocalExcel;
+
 
 function buscarQR() {
     const qrCode = document.getElementById('searchQR').value;
